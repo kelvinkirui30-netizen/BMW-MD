@@ -1,6 +1,7 @@
-FROM node:lts-buster
+# Fix: Upgraded from buster to bullseye so apt-get packages can download successfully
+FROM node:lts-bullseye
 
-# Fix: Set non-interactive mode, remove apt-get upgrade, and add --no-install-recommends
+# Set non-interactive mode and add --no-install-recommends
 RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   ffmpeg \
