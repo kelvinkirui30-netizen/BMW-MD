@@ -1,25 +1,26 @@
 FROM node:lts-buster
 
+# Fix: Set non-interactive mode, remove apt-get upgrade, and add --no-install-recommends
 RUN apt-get update && \
-  apt-get install -y \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   ffmpeg \
   imagemagick \
   webp && \
-  apt-get upgrade -y && \
-  npm i pm2 -g && \
   rm -rf /var/lib/apt/lists/*
-  
-RUN git clone https://github.com/ibrahimaitech/BMW-MD.git  /root/BmwMD
-WORKDIR /root/bmwmd/
 
+# Set up the working directory cleanly
+WORKDIR /root/BmwMD
 
+# Copy package structures first to leverage Docker build cache
 COPY package.json .
-RUN npm install pm2 -g
-RUN npm install --legacy-peer-deps
 
+# Install PM2 globally and production dependencies
+RUN npm i pm2 -g && \
+    npm install --legacy-peer-deps
+
+# Copy the rest of your application code
 COPY . .
 
 EXPOSE 5000
 
-CMD ["node", "ibrahim.js"]
-
+CMD ["pm2-runtime", "ibrahim.js"]
